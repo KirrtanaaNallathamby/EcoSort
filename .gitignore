@@ -1,6 +1,13 @@
 .env
+
+venv/
 __pycache__/
 *.pyc
-devel/
-build/
+
+captures/*
+!captures/.gitkeep
+
+weights/*.pt
+
+.idea/
 .vscode/
