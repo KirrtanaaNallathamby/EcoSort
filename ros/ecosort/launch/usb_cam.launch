@@ -1,11 +1,27 @@
 <launch>
-  <!-- USB webcam for IO-Juno MA02 (when Astra is not used) -->
+  <!-- USB camera for IO-Juno MA02
+       If VIDIOC_G_FMT error: try pixel_format:=mjpeg or video_device:=/dev/video0 -->
+  <arg name="video_device" default="/dev/video0"/>
+  <arg name="pixel_format" default="mjpeg"/>
+  <arg name="io_method" default="read"/>
+  <arg name="image_width" default="640"/>
+  <arg name="image_height" default="480"/>
+  <arg name="show_image" default="true"/>
+
   <node pkg="usb_cam" type="usb_cam_node" name="usb_cam" output="screen">
-    <param name="video_device" value="/dev/video1"/>
-    <param name="image_width" value="640"/>
-    <param name="image_height" value="480"/>
-    <param name="pixel_format" value="yuyv"/>
+    <param name="video_device" value="$(arg video_device)"/>
+    <param name="image_width" value="$(arg image_width)"/>
+    <param name="image_height" value="$(arg image_height)"/>
+    <param name="pixel_format" value="$(arg pixel_format)"/>
     <param name="camera_frame_id" value="usb_cam"/>
-    <param name="io_method" value="mmap"/>
+    <param name="camera_name" value="usb_cam"/>
+    <param name="io_method" value="$(arg io_method)"/>
+    <param name="framerate" value="30"/>
   </node>
+
+  <group if="$(arg show_image)">
+    <node pkg="image_view" type="image_view" name="usb_cam_view" output="screen">
+      <remap from="image" to="/usb_cam/image_raw"/>
+    </node>
+  </group>
 </launch>
