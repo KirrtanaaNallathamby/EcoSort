@@ -5,7 +5,7 @@
   <arg name="cmd_vel_topic" default="/cmd_vel"/>
   <arg name="enable_patrol" default="true"/>
 
-  <node pkg="sound_play" type="soundplay_node.py" name="sound_play" output="screen"/>
+  <node pkg="ecosort" type="sound_play_quiet.sh" name="sound_play" output="screen"/>
 
   <node pkg="ecosort" type="waste_detector_node.py" name="waste_detector" output="screen">
     <param name="camera_topic" value="$(arg camera_topic)"/>
@@ -21,6 +21,7 @@
     <param name="backend" value="robot"/>
     <param name="listen_timeout" value="5.0"/>
     <param name="phrase_time_limit" value="6.0"/>
+    <param name="quiet_alsa" value="true"/>
   </node>
 
   <group if="$(arg enable_patrol)">

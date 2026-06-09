@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+import sys
 import threading
 import time
 
@@ -11,6 +13,20 @@ from std_msgs.msg import String
 from ecosort.msg import EduResponse
 
 
+def _setup_ecosort_path():
+    try:
+        import rospkg
+        pkg_path = rospkg.RosPack().get_path("ecosort")
+    except Exception:
+        pkg_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if pkg_path not in sys.path:
+        sys.path.insert(0, pkg_path)
+
+
+_setup_ecosort_path()
+from ecosort_core.audio_utils import quiet_alsa
+
+
 class AudioHandlerNode(object):
     def __init__(self):
         rospy.init_node("audio_handler", anonymous=False)
@@ -18,9 +34,11 @@ class AudioHandlerNode(object):
         self.backend = rospy.get_param("~backend", "robot")
         self.listen_timeout = rospy.get_param("~listen_timeout", 5.0)
         self.phrase_time_limit = rospy.get_param("~phrase_time_limit", 6.0)
+        self.quiet_alsa = rospy.get_param("~quiet_alsa", True)
 
         self.recognizer = sr.Recognizer()
-        self.microphone = sr.Microphone()
+        with quiet_alsa(self.quiet_alsa):
+            self.microphone = sr.Microphone()
         self.running = True
         self.is_speaking = False
         self._sound_client = None
@@ -31,8 +49,9 @@ class AudioHandlerNode(object):
         self.audio_pub = rospy.Publisher("/audio/raw", String, queue_size=1)
         rospy.Subscriber("/edu/response", EduResponse, self._response_callback, queue_size=1)
 
-        with self.microphone as source:
-            self.recognizer.adjust_for_ambient_noise(source, duration=1)
+        with quiet_alsa(self.quiet_alsa):
+            with self.microphone as source:
+                self.recognizer.adjust_for_ambient_noise(source, duration=1)
 
         self.listen_thread = threading.Thread(target=self._listen_loop, daemon=True)
         self.listen_thread.start()
@@ -43,8 +62,9 @@ class AudioHandlerNode(object):
         try:
             from sound_play.libsoundplay import SoundClient
 
-            self._sound_client = SoundClient()
-            time.sleep(1)
+            with quiet_alsa(self.quiet_alsa):
+                self._sound_client = SoundClient()
+                time.sleep(1)
             rospy.loginfo("Using sound_play for robot TTS.")
         except ImportError:
             rospy.logwarn("sound_play not available, TTS will be text-only.")
@@ -57,12 +77,13 @@ class AudioHandlerNode(object):
                 continue
 
             try:
-                with self.microphone as source:
-                    audio = self.recognizer.listen(
-                        source,
-                        timeout=self.listen_timeout,
-                        phrase_time_limit=self.phrase_time_limit,
-                    )
+                with quiet_alsa(self.quiet_alsa):
+                    with self.microphone as source:
+                        audio = self.recognizer.listen(
+                            source,
+                            timeout=self.listen_timeout,
+                            phrase_time_limit=self.phrase_time_limit,
+                        )
                 text = self.recognizer.recognize_google(audio).lower()
                 rospy.loginfo("Heard: %s", text)
                 self.audio_pub.publish(String(data=text))

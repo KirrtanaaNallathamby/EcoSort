@@ -34,6 +34,11 @@ catkin_install_python(PROGRAMS
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
+install(PROGRAMS
+  scripts/sound_play_quiet.sh
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 install(DIRECTORY launch config ecosort_core
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

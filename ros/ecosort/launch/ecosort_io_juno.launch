@@ -1,6 +1,22 @@
 <launch>
-  <!-- Jupiter IO-Juno MA02 (Astra 3D camera, ROS Melodic, Python 3.8) -->
+  <!-- Jupiter IO-Juno MA02 — USB camera (default for MA02) -->
+  <arg name="start_usb_cam" default="true"/>
+  <arg name="video_device" default="/dev/video0"/>
+  <arg name="enable_patrol" default="true"/>
+
+  <group if="$(arg start_usb_cam)">
+    <node pkg="usb_cam" type="usb_cam_node" name="usb_cam" output="screen">
+      <param name="video_device" value="$(arg video_device)"/>
+      <param name="image_width" value="640"/>
+      <param name="image_height" value="480"/>
+      <param name="pixel_format" value="yuyv"/>
+      <param name="camera_frame_id" value="usb_cam"/>
+      <param name="io_method" value="mmap"/>
+    </node>
+  </group>
+
   <include file="$(find ecosort)/launch/ecosort_juno.launch">
-    <arg name="camera_topic" value="/camera_top/rgb/image_raw"/>
+    <arg name="camera_topic" value="/usb_cam/image_raw"/>
+    <arg name="enable_patrol" value="$(arg enable_patrol)"/>
   </include>
 </launch>

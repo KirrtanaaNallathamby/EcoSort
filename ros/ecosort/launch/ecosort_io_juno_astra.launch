@@ -1,0 +1,6 @@
+<launch>
+  <!-- IO-Juno with Astra camera (use only if multi_astra.launch is running) -->
+  <include file="$(find ecosort)/launch/ecosort_juno.launch">
+    <arg name="camera_topic" value="/camera_top/rgb/image_raw"/>
+  </include>
+</launch>
