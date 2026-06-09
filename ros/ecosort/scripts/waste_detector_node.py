@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 
 import cv2
 import rospy
@@ -9,9 +10,19 @@ from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
 
 from ecosort.msg import WasteDetection
-from ecosort_path import setup_ecosort_src_path
 
-setup_ecosort_src_path()
+
+def _setup_ecosort_path():
+    try:
+        import rospkg
+        pkg_path = rospkg.RosPack().get_path("ecosort")
+    except Exception:
+        pkg_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if pkg_path not in sys.path:
+        sys.path.insert(0, pkg_path)
+
+
+_setup_ecosort_path()
 from ecosort_core.vision_node import VisionNode
 
 
