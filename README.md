@@ -20,18 +20,18 @@ cd src
 python main.py
 ```
 
-## Quick start — Jupiter Juno (Python 3.8)
+## Quick start — Jupiter Juno (Python 3.8+)
 
 ### 1. Prerequisites on the robot
 
-- ROS Melodic
+- ROS Melodic or **ROS Noetic** (your IO-Juno MA02 may ship with Noetic)
 - `sound_play`, `cv_bridge`, `usb_cam` (or Juno camera bringup)
 - Internet access for Google STT and Gemini API
 
 ### 2. Install Python dependencies
 
 ```bash
-source /opt/ros/melodic/setup.bash
+source /opt/ros/noetic/setup.bash   # or melodic
 pip3 install --user -r requirements-juno.txt
 ```
 
@@ -52,7 +52,7 @@ Or create `~/.env` in the project root with the same variables.
 
 ```bash
 cd ~/EcoSort          # or wherever you cloned the project
-source /opt/ros/melodic/setup.bash
+source /opt/ros/noetic/setup.bash   # or melodic
 bash install_juno.sh
 ```
 
@@ -72,7 +72,7 @@ roscore
 **Terminal 2** — launch EcoSort:
 
 ```bash
-source /opt/ros/melodic/setup.bash
+source /opt/ros/noetic/setup.bash   # or melodic
 source ~/catkin_ws/devel/setup.bash
 export GEMINI_API_KEY="your-key"
 roslaunch ecosort ecosort_juno.launch

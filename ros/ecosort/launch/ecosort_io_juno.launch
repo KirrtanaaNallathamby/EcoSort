@@ -1,0 +1,6 @@
+<launch>
+  <!-- Jupiter IO-Juno MA02 (Astra 3D camera, ROS Melodic, Python 3.8) -->
+  <include file="$(find ecosort)/launch/ecosort_juno.launch">
+    <arg name="camera_topic" value="/camera_top/rgb/image_raw"/>
+  </include>
+</launch>

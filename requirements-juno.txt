@@ -1,6 +1,6 @@
-# Jupiter Juno robot (Python 3.8, ROS Melodic)
-# Install inside the robot's Python 3.8 environment AFTER sourcing ROS:
-#   source /opt/ros/melodic/setup.bash
+# Jupiter Juno robot (Python 3.8+, ROS Melodic or Noetic)
+# Install AFTER sourcing ROS:
+#   source /opt/ros/noetic/setup.bash
 #   pip3 install --user -r requirements-juno.txt
 
 ultralytics>=8.3.0,<8.4.0

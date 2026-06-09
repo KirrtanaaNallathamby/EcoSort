@@ -43,12 +43,20 @@ if [ "${MISSING}" -eq 1 ]; then
   exit 1
 fi
 
-# Source ROS Melodic
-if [ -f /opt/ros/melodic/setup.bash ]; then
+# Source ROS (Melodic or Noetic)
+if [ -n "${ROS_DISTRO:-}" ]; then
+  echo "ROS already sourced: ${ROS_DISTRO}"
+elif [ -f /opt/ros/noetic/setup.bash ]; then
+  # shellcheck disable=SC1091
+  source /opt/ros/noetic/setup.bash
+  echo "Sourced ROS Noetic"
+elif [ -f /opt/ros/melodic/setup.bash ]; then
   # shellcheck disable=SC1091
   source /opt/ros/melodic/setup.bash
-elif [ -z "${ROS_DISTRO:-}" ]; then
-  echo "ERROR: ROS Melodic not found at /opt/ros/melodic/setup.bash"
+  echo "Sourced ROS Melodic"
+else
+  echo "ERROR: ROS not found. Install Melodic or Noetic, or run:"
+  echo "  source /opt/ros/noetic/setup.bash"
   exit 1
 fi
 

@@ -1,6 +1,9 @@
 # EcoSort AI - Jupiter Juno configuration (ROS Melodic, Python 3.8)
 
-camera_topic: "/usb_cam/image_raw"
+# IO-Juno MA02 (Astra camera)
+camera_topic: "/camera_top/rgb/image_raw"
+# USB webcam fallback:
+# camera_topic: "/usb_cam/image_raw"
 cmd_vel_topic: "/cmd_vel"
 
 # Juno2 uses RealSense: "/camera/color/image_raw"
