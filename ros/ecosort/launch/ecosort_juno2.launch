@@ -1,0 +1,6 @@
+<launch>
+  <!-- EcoSort AI on Jupiter Juno2 (RealSense camera) -->
+  <include file="$(find ecosort)/launch/ecosort_juno.launch">
+    <arg name="camera_topic" value="/camera/color/image_raw"/>
+  </include>
+</launch>

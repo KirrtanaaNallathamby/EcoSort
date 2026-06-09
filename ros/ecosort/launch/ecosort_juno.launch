@@ -1,0 +1,41 @@
+<launch>
+  <!-- EcoSort AI on Jupiter Juno (ROS Melodic, Python 3.8) -->
+
+  <arg name="camera_topic" default="/usb_cam/image_raw"/>
+  <arg name="cmd_vel_topic" default="/cmd_vel"/>
+  <arg name="enable_patrol" default="true"/>
+
+  <node pkg="sound_play" type="soundplay_node.py" name="sound_play" output="screen"/>
+
+  <node pkg="ecosort" type="waste_detector_node.py" name="waste_detector" output="screen">
+    <param name="camera_topic" value="$(arg camera_topic)"/>
+    <param name="confidence_threshold" value="0.45"/>
+    <param name="publish_rate_hz" value="5.0"/>
+    <param name="yolo_model" value="yolo11n.pt"/>
+    <param name="capture_dir" value="$(env HOME)/ecosort_captures"/>
+  </node>
+
+  <node pkg="ecosort" type="gemini_brain_node.py" name="gemini_brain" output="screen"/>
+
+  <node pkg="ecosort" type="audio_handler_node.py" name="audio_handler" output="screen">
+    <param name="backend" value="robot"/>
+    <param name="listen_timeout" value="5.0"/>
+    <param name="phrase_time_limit" value="6.0"/>
+  </node>
+
+  <group if="$(arg enable_patrol)">
+    <node pkg="ecosort" type="patrol_nav_node.py" name="patrol_nav" output="screen">
+      <param name="cmd_vel_topic" value="$(arg cmd_vel_topic)"/>
+      <param name="linear_speed" value="0.08"/>
+      <param name="angular_speed" value="0.25"/>
+      <param name="patrol_duration_sec" value="4.0"/>
+      <param name="turn_duration_sec" value="2.0"/>
+      <param name="engage_on_person" value="true"/>
+      <param name="engage_on_waste" value="true"/>
+    </node>
+  </group>
+
+  <node pkg="ecosort" type="orchestrator_node.py" name="ecosort_orchestrator" output="screen">
+    <param name="greeting" value="Hello, I am EcoSort AI. Show me your waste item and ask me about recycling."/>
+  </node>
+</launch>

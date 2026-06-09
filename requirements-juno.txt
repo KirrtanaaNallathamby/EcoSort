@@ -1,0 +1,17 @@
+# Jupiter Juno robot (Python 3.8, ROS Melodic)
+# Install inside the robot's Python 3.8 environment AFTER sourcing ROS:
+#   source /opt/ros/melodic/setup.bash
+#   pip3 install --user -r requirements-juno.txt
+
+ultralytics>=8.3.0,<8.4.0
+opencv-python-headless>=4.5.0,<4.10.0
+python-dotenv>=0.19.0,<1.0.0
+SpeechRecognition>=3.8.0,<4.0.0
+pyaudio>=0.2.11
+pillow>=8.0.0,<10.0.0
+requests>=2.25.0,<3.0.0
+numpy>=1.19.0,<1.25.0
+
+# google-genai requires Python 3.9+; Juno uses REST fallback in gemini_client.py
+# Desktop only (optional):
+# google-genai>=1.0.0

@@ -1,13 +1,15 @@
-import cv2
 import time
+
+import cv2
+
+from brain_node import BrainNode
 from camera_utils import get_camera
 from vision_node import VisionNode
-from brain_node import BrainNode
 from voice_node import VoiceNode
 
 
 def is_identification_question(text):
-    return any(k in text for k in [
+    return any(keyword in text for keyword in [
         "what is this",
         "what is it",
         "what waste",
@@ -19,7 +21,7 @@ def is_identification_question(text):
 
 
 def is_recycle_question(text):
-    return any(k in text for k in [
+    return any(keyword in text for keyword in [
         "can it be recycled",
         "can this be recycled",
         "is it recyclable",
@@ -30,7 +32,7 @@ def is_recycle_question(text):
 
 
 def is_final_advice_question(text):
-    return any(k in text for k in [
+    return any(keyword in text for keyword in [
         "where",
         "throw",
         "dispose",
@@ -46,28 +48,26 @@ def is_final_advice_question(text):
 def main():
     vision = VisionNode()
     brain = BrainNode()
-    voice = VoiceNode()
+    voice = VoiceNode(backend="desktop")
 
     cap = get_camera(0)
-
     voice.speak("EcoSort AI is ready. Show me a waste item and ask what is this.")
     time.sleep(1)
+
     latest_detection = None
     state = "waiting_for_identification"
 
     while True:
         ret, frame = cap.read()
-
         if not ret:
             continue
 
         detection = vision.detect_waste(frame)
-
         if detection:
             latest_detection = detection
             cv2.putText(
                 frame,
-                f"{detection['broad_class']} detected",
+                "{label} detected".format(label=detection["broad_class"]),
                 (30, 50),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 1,
@@ -76,7 +76,6 @@ def main():
             )
 
         cv2.imshow("EcoSort AI - Press Q to quit", frame)
-
         speech = voice.get_latest_speech()
 
         if speech:
@@ -90,26 +89,23 @@ def main():
             if state == "waiting_for_identification":
                 if is_identification_question(speech):
                     brain.receive_detection(latest_detection)
-                    answer = brain.answer_identification()
-                    voice.speak(answer)
+                    voice.speak(brain.answer_identification())
                     time.sleep(1)
                     state = "waiting_for_recycle_question"
 
             elif state == "waiting_for_recycle_question":
                 if is_recycle_question(speech):
-                    answer = brain.answer_recyclability()
-                    voice.speak(answer)
+                    voice.speak(brain.answer_recyclability())
                     time.sleep(1)
                     state = "waiting_for_final_question"
 
             elif state == "waiting_for_final_question":
                 if is_final_advice_question(speech):
-                    answer = brain.answer_final_advice()
-                    voice.speak(answer)
+                    voice.speak(brain.answer_final_advice())
                     time.sleep(1)
                     voice.speak("Interaction complete. Show me another item.")
                     time.sleep(1)
-                    brain.cached_analysis = None
+                    brain.reset_session()
                     state = "waiting_for_identification"
 
         if cv2.waitKey(1) & 0xFF == ord("q"):

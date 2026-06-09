@@ -1,0 +1,22 @@
+<launch>
+  <!-- Desktop simulation: no patrol movement, local webcam via usb_cam -->
+
+  <node pkg="usb_cam" type="usb_cam_node" name="usb_cam" output="screen">
+    <param name="video_device" value="/dev/video0"/>
+    <param name="image_width" value="640"/>
+    <param name="image_height" value="480"/>
+    <param name="pixel_format" value="yuyv"/>
+    <param name="camera_frame_id" value="usb_cam"/>
+  </node>
+
+  <node pkg="sound_play" type="soundplay_node.py" name="sound_play" output="screen"/>
+
+  <node pkg="ecosort" type="waste_detector_node.py" name="waste_detector" output="screen"/>
+  <node pkg="ecosort" type="gemini_brain_node.py" name="gemini_brain" output="screen"/>
+
+  <node pkg="ecosort" type="audio_handler_node.py" name="audio_handler" output="screen">
+    <param name="backend" value="robot"/>
+  </node>
+
+  <node pkg="ecosort" type="orchestrator_node.py" name="ecosort_orchestrator" output="screen"/>
+</launch>

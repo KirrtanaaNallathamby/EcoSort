@@ -1,27 +1,25 @@
 import os
-import json
+
 from dotenv import load_dotenv
-from google import genai
-from google.genai import types
+
+from gemini_client import DEFAULT_MODEL, generate_json_from_image
 
 
 class BrainNode:
     def __init__(self):
         load_dotenv()
-
-        api_key = os.getenv("GEMINI_API_KEY")
-        self.model_name = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
-
-        if not api_key:
-            raise RuntimeError("Missing GEMINI_API_KEY in .env")
-
-        self.client = genai.Client(api_key=api_key)
+        self.model_name = os.getenv("GEMINI_MODEL", DEFAULT_MODEL)
+        self.api_key = os.getenv("GEMINI_API_KEY")
         self.current_detection = None
         self.cached_analysis = None
 
+        if not self.api_key:
+            raise RuntimeError("Missing GEMINI_API_KEY in .env")
+
     def receive_detection(self, detection):
-        self.current_detection = detection
-        self.cached_analysis = None
+        if self.current_detection != detection:
+            self.current_detection = detection
+            self.cached_analysis = None
 
     def analyze_once_with_gemini(self):
         if self.cached_analysis:
@@ -30,15 +28,14 @@ class BrainNode:
         if not self.current_detection:
             return None
 
-        d = self.current_detection
-
-        prompt = f"""
+        detection = self.current_detection
+        prompt = """
 You are EcoSort AI, a recycling assistant robot.
 
 YOLO detected:
-YOLO label: {d["yolo_label"]}
-Broad waste class: {d["broad_class"]}
-Confidence: {d["confidence"]}
+YOLO label: {yolo_label}
+Broad waste class: {broad_class}
+Confidence: {confidence}
 
 Use the attached image and YOLO result together.
 
@@ -64,27 +61,22 @@ The JSON object must follow this exact format:
   "recyclability_reply": "short robot answer for: can it be recycled?",
   "final_advice_reply": "short robot answer for: where to throw it or what should be done?"
 }}
-"""
+""".format(
+            yolo_label=detection["yolo_label"],
+            broad_class=detection["broad_class"],
+            confidence=detection["confidence"],
+        )
 
-        uploaded_image = self.client.files.upload(file=d["image_path"])
-
-        response = self.client.models.generate_content(
-            model=self.model_name,
-            contents=[uploaded_image, prompt],
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                temperature=0.2,
-            ),
+        data = generate_json_from_image(
+            image_path=detection["image_path"],
+            prompt=prompt,
+            api_key=self.api_key,
+            model_name=self.model_name,
         )
 
         print("\n========== GEMINI RAW ==========")
-        print(response.text)
+        print(data)
         print("================================\n")
-
-        data = json.loads(response.text)
-
-        if isinstance(data, list):
-            raise ValueError("Gemini returned a list instead of one JSON object.")
 
         self.cached_analysis = data
         return self.cached_analysis
@@ -106,10 +98,9 @@ The JSON object must follow this exact format:
         if not analysis:
             return "Please show me a waste item first."
         return analysis["final_advice_reply"]
-    
+
     def answer_user_question(self, user_question):
         analysis = self.analyze_once_with_gemini()
-
         if not analysis:
             return "Please show me a waste item first."
 
@@ -122,50 +113,22 @@ The JSON object must follow this exact format:
             return analysis["recyclability_reply"]
 
         if any(word in question for word in ["where", "bin", "throw", "dispose"]):
-            return f"Put it in the {analysis['recycling_bin']}."
+            return "Put it in the {bin}.".format(bin=analysis["recycling_bin"])
 
         if any(word in question for word in ["what should", "what can", "how", "clean", "wash"]):
             return analysis["final_advice_reply"]
 
-        if any(word in question for word in ["why"]):
+        if "why" in question:
             return analysis["reason"]
 
         return (
-            f"This is {analysis['specific_object']}. "
-            f"{analysis['recyclability_reply']} "
-            f"{analysis['final_advice_reply']}"
+            "This is {object_name}. {recyclability} {advice}".format(
+                object_name=analysis["specific_object"],
+                recyclability=analysis["recyclability_reply"],
+                advice=analysis["final_advice_reply"],
+            )
         )
-    
-    def receive_detection(self, detection):
-        if self.current_detection != detection:
-            self.current_detection = detection
-            self.cached_analysis = None
 
-    def answer_user_question(self, user_question):
-        analysis = self.analyze_once_with_gemini()
-
-        if not analysis:
-            return "Please show me a waste item first."
-
-        q = user_question.lower()
-
-        if any(x in q for x in ["what is", "what kind", "identify", "what waste"]):
-            return analysis["identification_reply"]
-
-        if any(x in q for x in ["recycle", "recyclable", "can it", "can this"]):
-            return analysis["recyclability_reply"]
-
-        if any(x in q for x in ["where", "bin", "throw", "dispose"]):
-            return f"Put it in the {analysis['recycling_bin']}."
-
-        if any(x in q for x in ["what should", "what can", "how", "clean", "wash"]):
-            return analysis["final_advice_reply"]
-
-        if "why" in q:
-            return analysis["reason"]
-
-        return (
-            f"This is {analysis['specific_object']}. "
-            f"{analysis['recyclability_reply']} "
-            f"{analysis['final_advice_reply']}"
-        )
+    def reset_session(self):
+        self.current_detection = None
+        self.cached_analysis = None

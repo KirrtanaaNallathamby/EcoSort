@@ -1,0 +1,31 @@
+# EcoSort AI - Jupiter Juno configuration (ROS Melodic, Python 3.8)
+
+camera_topic: "/usb_cam/image_raw"
+cmd_vel_topic: "/cmd_vel"
+
+# Juno2 uses RealSense: "/camera/color/image_raw"
+# camera_topic: "/camera/color/image_raw"
+
+waste_detector:
+  confidence_threshold: 0.45
+  publish_rate_hz: 5.0
+  yolo_model: "yolo11n.pt"
+
+gemini_brain:
+  model: "gemini-3.1-flash-lite"
+
+audio_handler:
+  backend: "robot"
+  listen_timeout: 5.0
+  phrase_time_limit: 6.0
+
+patrol_nav:
+  linear_speed: 0.08
+  angular_speed: 0.25
+  patrol_duration_sec: 4.0
+  turn_duration_sec: 2.0
+  engage_on_person: true
+  engage_on_waste: true
+
+orchestrator:
+  greeting: "Hello, I am EcoSort AI. Show me your waste item and ask me about recycling."
