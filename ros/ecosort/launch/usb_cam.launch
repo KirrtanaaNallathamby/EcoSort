@@ -1,11 +1,21 @@
 <launch>
-  <!-- USB webcam for IO-Juno MA02 (when Astra is not used) -->
+  <!-- USB webcam for IO-Juno MA02 -->
+  <arg name="video_device" default="/dev/video1"/>
+  <arg name="show_image" default="true"/>
+
   <node pkg="usb_cam" type="usb_cam_node" name="usb_cam" output="screen">
-    <param name="video_device" value="/dev/video1"/>
+    <param name="video_device" value="$(arg video_device)"/>
     <param name="image_width" value="640"/>
     <param name="image_height" value="480"/>
     <param name="pixel_format" value="yuyv"/>
     <param name="camera_frame_id" value="usb_cam"/>
     <param name="io_method" value="mmap"/>
   </node>
+
+  <!-- Preview window (usb_cam alone does not show video) -->
+  <group if="$(arg show_image)">
+    <node pkg="image_view" type="image_view" name="usb_cam_view" output="screen">
+      <remap from="image" to="/usb_cam/image_raw"/>
+    </node>
+  </group>
 </launch>
