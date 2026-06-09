@@ -19,3 +19,13 @@ chmod +x main_ros.py
 python3 main_ros.py
 
 https://docs.google.com/document/d/1PWbYBl1ev9JOtkP-8UHw8B7qIUJ1jNuekc2gicWYxTs/edit?usp=sharing
+
+# 1. Remove the broken version of OpenCV
+pip3 uninstall opencv-python opencv-python-headless -y
+
+# 2. Install the Linux window drawing tools
+sudo apt-get update
+sudo apt-get install libgtk2.0-dev pkg-config libcanberra-gtk-module -y
+
+# 3. Reinstall the correct OpenCV
+pip3 install opencv-python
