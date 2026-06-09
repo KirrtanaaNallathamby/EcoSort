@@ -3,15 +3,14 @@ import sys
 
 
 def setup_ecosort_src_path():
+    """Add the ecosort catkin package root so ecosort_core can be imported."""
     try:
         import rospkg
 
         pkg_path = rospkg.RosPack().get_path("ecosort")
-        repo_src = os.path.abspath(os.path.join(pkg_path, "..", "..", "src"))
     except Exception:
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        repo_src = os.path.abspath(os.path.join(script_dir, "..", "..", "..", "src"))
+        pkg_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    if repo_src not in sys.path:
-        sys.path.insert(0, repo_src)
-    return repo_src
+    if pkg_path not in sys.path:
+        sys.path.insert(0, pkg_path)
+    return pkg_path

@@ -8,7 +8,7 @@ from ecosort.msg import EduResponse, WasteDetection
 from ecosort_path import setup_ecosort_src_path
 
 setup_ecosort_src_path()
-from brain_node import BrainNode
+from ecosort_core.brain_node import BrainNode
 
 
 class GeminiBrainNode(object):

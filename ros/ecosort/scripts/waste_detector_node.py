@@ -12,7 +12,7 @@ from ecosort.msg import WasteDetection
 from ecosort_path import setup_ecosort_src_path
 
 setup_ecosort_src_path()
-from vision_node import VisionNode
+from ecosort_core.vision_node import VisionNode
 
 
 class WasteDetectorNode(object):

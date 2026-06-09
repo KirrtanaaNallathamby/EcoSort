@@ -48,13 +48,15 @@ Or create `~/.env` in the project root with the same variables.
 
 ### 4. Build ROS package
 
+**Important:** run install from inside the EcoSort repo folder.
+
 ```bash
-cd ~/catkin_ws/src
-# copy or symlink this repo
-cd ~/catkin_ws
-catkin_make
-source devel/setup.bash
+cd ~/EcoSort          # or wherever you cloned the project
+source /opt/ros/melodic/setup.bash
+bash install_juno.sh
 ```
+
+This links `ros/ecosort` → `~/catkin_ws/src/ecosort` and runs `catkin_make`.
 
 ### 5. Launch on Juno
 
@@ -103,13 +105,11 @@ roslaunch ecosort ecosort_juno2.launch
 
 ```
 EcoSort/
-├── src/                    # Core AI logic (shared)
-│   ├── vision_node.py      # YOLOv11 detection
-│   ├── brain_node.py       # Gemini reasoning
-│   ├── voice_node.py       # STT/TTS (desktop)
-│   ├── gemini_client.py    # Python 3.8 REST fallback
+├── install_juno.sh         # Run this on Juno (from repo root)
+├── src/
 │   └── main.py             # Desktop entry point
 ├── ros/ecosort/            # ROS Melodic catkin package
+│   ├── ecosort_core/       # Shared AI modules (YOLO, Gemini, voice)
 │   ├── scripts/            # ROS nodes
 │   ├── launch/             # Launch files
 │   └── msg/                # Custom messages
@@ -121,6 +121,7 @@ EcoSort/
 
 | Issue | Fix |
 |-------|-----|
+| `No such file or directory` on install | `cd` into the EcoSort repo first, then run `bash install_juno.sh` |
 | No camera frames | Check `rostopic echo /usb_cam/image_raw` or set `camera_topic` in launch |
 | No speech output | Ensure `sound_play` node is running |
 | Gemini error on Juno | Verify `GEMINI_API_KEY` and internet; REST fallback is used on Python 3.8 |

@@ -1,11 +1,17 @@
+import os
+import sys
 import time
 
 import cv2
 
-from brain_node import BrainNode
-from camera_utils import get_camera
-from vision_node import VisionNode
-from voice_node import VoiceNode
+# Use shared core modules from the ROS package
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(_REPO_ROOT, "ros", "ecosort"))
+
+from ecosort_core.brain_node import BrainNode
+from ecosort_core.camera_utils import get_camera
+from ecosort_core.vision_node import VisionNode
+from ecosort_core.voice_node import VoiceNode
 
 
 def is_identification_question(text):

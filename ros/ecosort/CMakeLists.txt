@@ -34,6 +34,6 @@ catkin_install_python(PROGRAMS
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-install(DIRECTORY launch config
+install(DIRECTORY launch config ecosort_core
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
