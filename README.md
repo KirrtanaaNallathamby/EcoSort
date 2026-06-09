@@ -126,3 +126,5 @@ EcoSort/
 | No speech output | Ensure `sound_play` node is running |
 | Gemini error on Juno | Verify `GEMINI_API_KEY` and internet; REST fallback is used on Python 3.8 |
 | Robot does not move | Check `rostopic pub /cmd_vel` and base driver is active |
+
+https://docs.google.com/document/d/1PWbYBl1ev9JOtkP-8UHw8B7qIUJ1jNuekc2gicWYxTs/edit?usp=sharing
