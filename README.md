@@ -117,12 +117,38 @@ EcoSort/
 └── requirements-juno.txt   # Juno robot (Python 3.8)
 ```
 
+## Camera on IO-Juno MA02
+
+**Run `roslaunch` on the Juno robot**, not on your laptop. If you run `python src/main.py` on a laptop, it will use the **laptop webcam**.
+
+On the robot, find the correct camera:
+
+```bash
+cd ~/EcoSort
+bash scripts/find_juno_camera.sh
+```
+
+Then launch with the right device (often `/dev/video1`, not `video0`):
+
+```bash
+roslaunch ecosort ecosort_io_juno.launch video_device:=/dev/video1
+```
+
+If Juno already has a camera node running, don't start usb_cam:
+
+```bash
+rostopic list | grep image
+roslaunch ecosort ecosort_io_juno.launch start_usb_cam:=false camera_topic:=/your/topic/image_raw
+```
+
 ## Troubleshooting
 
 | Issue | Fix |
 |-------|-----|
+| Uses laptop camera | Run on the **robot**, not `python main.py` on PC |
+| Wrong / empty camera | `bash scripts/find_juno_camera.sh` then try `video_device:=/dev/video1` |
 | `No such file or directory` on install | `cd` into the EcoSort repo first, then run `bash install_juno.sh` |
-| No camera frames | Check `rostopic echo /usb_cam/image_raw` or set `camera_topic` in launch |
+| No camera frames | Check `rostopic hz /usb_cam/image_raw` or set `camera_topic` in launch |
 | No speech output | Ensure `sound_play` node is running |
 | Gemini error on Juno | Verify `GEMINI_API_KEY` and internet; REST fallback is used on Python 3.8 |
 | Robot does not move | Check `rostopic pub /cmd_vel` and base driver is active |

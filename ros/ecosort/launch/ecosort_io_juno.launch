@@ -1,7 +1,11 @@
 <launch>
-  <!-- Jupiter IO-Juno MA02 — USB camera (default for MA02) -->
+  <!-- Jupiter IO-Juno MA02
+       IMPORTANT: run roslaunch ON THE ROBOT (not your laptop).
+       If start_usb_cam opens the wrong camera, run scripts/find_juno_camera.sh -->
+
   <arg name="start_usb_cam" default="true"/>
-  <arg name="video_device" default="/dev/video0"/>
+  <arg name="video_device" default="/dev/video1"/>
+  <arg name="camera_topic" default="/usb_cam/image_raw"/>
   <arg name="enable_patrol" default="true"/>
 
   <group if="$(arg start_usb_cam)">
@@ -16,7 +20,7 @@
   </group>
 
   <include file="$(find ecosort)/launch/ecosort_juno.launch">
-    <arg name="camera_topic" value="/usb_cam/image_raw"/>
+    <arg name="camera_topic" value="$(arg camera_topic)"/>
     <arg name="enable_patrol" value="$(arg enable_patrol)"/>
   </include>
 </launch>
