@@ -17,3 +17,5 @@ roscore
 go to your project folder:
 chmod +x main_ros.py
 python3 main_ros.py
+
+https://docs.google.com/document/d/1PWbYBl1ev9JOtkP-8UHw8B7qIUJ1jNuekc2gicWYxTs/edit?usp=sharing
