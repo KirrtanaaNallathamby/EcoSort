@@ -1,0 +1,19 @@
+git fetch origin
+
+git branch -r
+
+git switch jeeva_version
+
+git branch 
+
+open any terminal and run this:
+sudo apt-get update
+sudo apt-get install espeak portaudio19-dev python3-pyaudio
+pip3 install SpeechRecognition pyttsx3 opencv-python ultralytics python-dotenv requests google-genai
+
+in the same terminal:
+roscore
+
+go to your project folder:
+chmod +x main_ros.py
+python3 main_ros.py
